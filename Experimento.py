@@ -34,44 +34,164 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# CSS personalizado
+
+# CSS personalizado - Esquema oscuro forzado
 st.markdown(
     """
     <style>
+    /* Forzar tema oscuro en toda la aplicación */
+    .stApp {
+        background-color: #0a0e27 !important;
+        color: #e5e7eb !important;
+    }
+    
+    /* Fondo de la barra lateral */
+    [data-testid="stSidebar"] {
+        background-color: #0d1117 !important;
+    }
+    
+    [data-testid="stSidebar"] > div:first-child {
+        background-color: #0d1117 !important;
+    }
+    
+    /* Fondo del contenido principal */
+    .main .block-container {
+        background-color: #0a0e27 !important;
+        padding-top: 2rem;
+    }
+    
     .main-header {
         font-size: 2.5rem;
         font-weight: 700;
-        color: #1f77b4;
+        color: #00d9ff;
         text-align: center;
         padding: 1rem 0;
+        text-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
     }
+    
     .metric-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #1a1f3a 0%, #2d1b4e 100%);
         padding: 1.5rem;
         border-radius: 10px;
+        border: 1px solid rgba(168, 85, 247, 0.2);
         color: white;
         text-align: center;
     }
+    
+    /* Estilo de métricas */
     .stMetric {
-        background-color: #262730;
-        padding: 1rem;
-        border-radius: 8px;
-        border: 1px solid #3d3d4d;
+        background-color: #151a2e !important;
+        padding: 1.5rem !important;
+        border-radius: 12px !important;
+        border: 1px solid rgba(0, 217, 255, 0.15) !important;
     }
+    
     .stMetric label {
-        color: #fafafa !important;
+        color: #9ca3af !important;
+        font-size: 0.9rem !important;
     }
+    
     .stMetric [data-testid="stMetricValue"] {
         color: #ffffff !important;
+        font-weight: 600 !important;
     }
+    
     .stMetric [data-testid="stMetricDelta"] {
-        color: #09ab3b !important;
+        color: #10b981 !important;
     }
+    
+    /* Tablas y DataFrames */
     .stDataFrame {
-        background-color: #1e1e1e;
+        background-color: #151a2e !important;
+        border-radius: 8px !important;
+        border: 1px solid rgba(0, 217, 255, 0.1) !important;
     }
-    .element-container {
-        color: #fafafa;
+    
+    .stDataFrame [data-testid="stDataFrameResizable"] {
+        background-color: #151a2e !important;
+    }
+    
+    /* Inputs y selectboxes */
+    .stTextInput input, .stSelectbox select, .stMultiSelect {
+        background-color: #151a2e !important;
+        color: #e5e7eb !important;
+        border: 1px solid rgba(0, 217, 255, 0.2) !important;
+        border-radius: 8px !important;
+    }
+    
+    /* Botones */
+    .stButton button {
+        background: linear-gradient(135deg, #00d9ff 0%, #a855f7 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        padding: 0.6rem 1.5rem !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stButton button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 5px 20px rgba(0, 217, 255, 0.4) !important;
+    }
+    
+    /* Checkboxes */
+    .stCheckbox {
+        color: #e5e7eb !important;
+    }
+    
+    /* Sliders */
+    .stSlider {
+        color: #e5e7eb !important;
+    }
+    
+    /* Expanders */
+    .streamlit-expanderHeader {
+        background-color: #151a2e !important;
+        color: #e5e7eb !important;
+        border-radius: 8px !important;
+        border: 1px solid rgba(0, 217, 255, 0.15) !important;
+    }
+    
+    /* Headers y texto */
+    h1, h2, h3, h4, h5, h6 {
+        color: #f3f4f6 !important;
+    }
+    
+    p, span, div {
+        color: #e5e7eb !important;
+    }
+    
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        background-color: #151a2e !important;
+        border-radius: 8px !important;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        color: #9ca3af !important;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        color: #00d9ff !important;
+        border-bottom-color: #00d9ff !important;
+    }
+    
+    /* Mensajes de info/warning/success */
+    .stAlert {
+        background-color: #151a2e !important;
+        border-left: 4px solid #00d9ff !important;
+        color: #e5e7eb !important;
+    }
+    
+    /* Divisores */
+    hr {
+        border-color: rgba(0, 217, 255, 0.2) !important;
+    }
+    
+    /* Spinner */
+    .stSpinner > div {
+        border-top-color: #00d9ff !important;
     }
     </style>
 """,
@@ -896,7 +1016,7 @@ if st.session_state.datos_descargados is not None:
             title="Frontera Eficiente (con Ledoit-Wolf Shrinkage y Límites Dinámicos)",
             xaxis_title="Volatilidad (Riesgo) %",
             yaxis_title="Rendimiento Esperado %",
-            template="plotly_white",
+            template="plotly_dark",
             height=500,
             hovermode='closest'
         )
@@ -1018,7 +1138,7 @@ if st.session_state.datos_descargados is not None:
                 title="Comparación Sharpe Ratio",
                 xaxis_title="Ticker",
                 yaxis_title="Sharpe",
-                template="plotly_white",
+                template="plotly_dark",
                 height=350
             )
             st.plotly_chart(fig_sharpe, use_container_width=True)
@@ -1047,7 +1167,7 @@ if st.session_state.datos_descargados is not None:
                 title="Riesgo vs Retorno",
                 xaxis_title="Volatilidad %",
                 yaxis_title="Rendimiento %",
-                template="plotly_white",
+                template="plotly_dark",
                 height=350
             )
             st.plotly_chart(fig_scatter, use_container_width=True)
@@ -1105,7 +1225,7 @@ if st.session_state.datos_descargados is not None:
         title=f"{ticker_seleccionado} - Precio con Medias Móviles",
         yaxis_title="Precio USD",
         xaxis_title="Fecha",
-        template="plotly_white",
+        template="plotly_dark",
         height=500,
         xaxis_rangeslider_visible=False
     )
@@ -1126,7 +1246,7 @@ if st.session_state.datos_descargados is not None:
     fig_volume.update_layout(
         title=f"{ticker_seleccionado} - Volumen de Operaciones",
         yaxis_title="Volumen",
-        template="plotly_white",
+        template="plotly_dark",
         height=300
     )
     st.plotly_chart(fig_volume, use_container_width=True)
@@ -1158,7 +1278,7 @@ if st.session_state.datos_descargados is not None:
         fig_comp.update_layout(
             title="Rendimiento Relativo (Base 100)",
             yaxis_title="Valor Indexado",
-            template="plotly_white",
+            template="plotly_dark",
             height=500,
             hovermode='x unified'
         )
@@ -1196,7 +1316,7 @@ if st.session_state.datos_descargados is not None:
         fig_rsi.update_layout(
             title=f"{ticker_seleccionado} - RSI (14 períodos)",
             yaxis_title="RSI",
-            template="plotly_white",
+            template="plotly_dark",
             height=300
         )
         st.plotly_chart(fig_rsi, use_container_width=True)
@@ -1241,7 +1361,7 @@ if st.session_state.datos_descargados is not None:
         fig_bb.update_layout(
             title=f"{ticker_seleccionado} - Bandas de Bollinger (20, 2)",
             yaxis_title="Precio",
-            template="plotly_white",
+            template="plotly_dark",
             height=300
         )
         st.plotly_chart(fig_bb, use_container_width=True)
@@ -1375,7 +1495,7 @@ if st.session_state.datos_descargados is not None:
                             title="Comparación P/E Ratio",
                             xaxis_title="Ticker",
                             yaxis_title="P/E",
-                            template="plotly_white",
+                            template="plotly_dark",
                             height=400
                         )
                         st.plotly_chart(fig_pe, use_container_width=True)
