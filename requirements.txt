@@ -6,3 +6,4 @@ plotly
 scipy
 scikit-learn
 openpyxl
+core_quant
