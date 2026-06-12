@@ -5,7 +5,14 @@ Interfaz Streamlit. Todo el cálculo financiero vive en core_quant.py
 (funciones puras, verificadas con tests en test_core_quant.py).
 
 Ejecutar:  streamlit run Experimento.py
+
+Despliegue en Streamlit Community Cloud — el repositorio DEBE contener en la
+raíz: Experimento.py, core_quant.py y requirements.txt (con ese nombre
+exacto). Opcional: .streamlit/config.toml para el tema oscuro.
 """
+from __future__ import annotations  # compatibilidad de anotaciones con Python 3.9
+
+import time
 from datetime import datetime, timedelta
 from io import BytesIO
 
@@ -92,16 +99,37 @@ def etiqueta_sharpe(s: float) -> str:
 @st.cache_data(ttl=3600, show_spinner=False)
 def descargar_datos(tickers: tuple, periodo: str | None,
                     inicio: str | None, fin: str | None) -> pd.DataFrame:
-    kwargs = {"progress": False, "auto_adjust": False, "threads": True}
-    if inicio and fin:
-        data = yf.download(list(tickers), start=inicio, end=fin, **kwargs)
-    else:
-        data = yf.download(list(tickers), period=periodo, **kwargs)
-    if data is None:
-        return pd.DataFrame()
-    if isinstance(data.index, pd.DatetimeIndex) and data.index.tz is not None:
-        data.index = data.index.tz_localize(None)
-    return data
+    """Descarga con reintentos. En Streamlit Cloud las IPs compartidas sufren
+    rate-limit de Yahoo: se reintenta con espera creciente. threads=False
+    evita el error 'database is locked' del caché sqlite de yfinance.
+
+    Si tras los reintentos no hay datos se lanza excepción (las excepciones
+    NO se cachean; un DataFrame vacío sí se cachearía durante 1 hora).
+    """
+    kwargs = {"progress": False, "auto_adjust": False, "threads": False}
+    ultimo_error: Exception | None = None
+    for intento in range(3):
+        if intento:
+            time.sleep(3 * intento)
+        try:
+            if inicio and fin:
+                data = yf.download(list(tickers), start=inicio, end=fin, **kwargs)
+            else:
+                data = yf.download(list(tickers), period=periodo, **kwargs)
+        except Exception as err:
+            ultimo_error = err
+            continue
+        if data is not None and not data.empty:
+            if (isinstance(data.index, pd.DatetimeIndex)
+                    and data.index.tz is not None):
+                data.index = data.index.tz_localize(None)
+            return data
+    raise RuntimeError(
+        "Yahoo Finance no devolvió datos tras 3 intentos"
+        + (f" (último error: {ultimo_error})" if ultimo_error else "")
+        + ". Causa frecuente en la nube: límite temporal de peticiones — "
+        "espera 1–2 minutos y vuelve a presionar 'Analizar Activos'."
+    )
 
 
 def extraer_campo(data: pd.DataFrame, campo: str, tickers: list) -> pd.DataFrame:
